@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can view own submissions" ON public.ctf_submissions;

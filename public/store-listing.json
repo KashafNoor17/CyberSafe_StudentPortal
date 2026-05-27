@@ -1,0 +1,77 @@
+{
+  "appName": "CyberSafe Student Portal",
+  "subtitle": "Learn Cybersecurity Anywhere",
+  "version": "1.0.0",
+  "buildNumber": 1,
+
+  "ios": {
+    "bundleId": "app.lovable.f8172b8adce74f819ee6f01fa9dc0397",
+    "category": "Education",
+    "ageRating": "4+",
+    "shortDescription": "Learn essential cybersecurity skills through interactive modules, quizzes, and CTF challenges.",
+    "description": "CyberSafe Student Portal is your comprehensive cybersecurity education companion. Learn anywhere, anytime — even offline.\n\n🔐 LEARN CYBERSECURITY\n• Interactive modules covering password security, phishing detection, social media safety, and more\n• Video lessons with expert-curated content\n• Hands-on exercises and real-world scenarios\n\n🏆 GAMIFIED EXPERIENCE\n• Earn badges and achievements as you progress\n• Compete on leaderboards with fellow students\n• Complete daily challenges and maintain your learning streak\n\n🚩 CAPTURE THE FLAG (CTF)\n• Practice offensive and defensive security skills\n• Join teams and compete in live CTF competitions\n• Solve challenges across web, crypto, forensics, and more\n\n📱 MOBILE-FIRST FEATURES\n• Download modules for offline learning\n• Push notifications for streak reminders\n• QR code scanner for team joining and certificate verification\n• Biometric login with Face ID and Touch ID\n\n👥 COMMUNITY\n• Join study groups and discussion forums\n• Connect with mentors and fellow learners\n• Share achievements and certificates\n\n📜 EARN CERTIFICATES\n• Verifiable certificates upon course completion\n• Share credentials on LinkedIn and social media\n• QR-code verification for authenticity\n\nCyberSafe is trusted by students and universities worldwide. Start your cybersecurity journey today!",
+    "keywords": "cybersecurity,education,learning,security,CTF,hacking,phishing,password,privacy,digital safety,student,certificate",
+    "supportUrl": "https://cybersafe-edu.lovable.app/contact",
+    "marketingUrl": "https://cybersafe-edu.lovable.app",
+    "privacyPolicyUrl": "https://cybersafe-edu.lovable.app/privacy",
+    "screenshotSizes": ["6.7-inch (iPhone 15 Pro Max)", "6.5-inch (iPhone 11 Pro Max)", "5.5-inch (iPhone 8 Plus)"],
+    "contentRights": true
+  },
+
+  "android": {
+    "packageName": "app.lovable.f8172b8adce74f819ee6f01fa9dc0397",
+    "category": "Education",
+    "contentRating": "Everyone",
+    "shortDescription": "Learn cybersecurity skills with interactive modules, CTF challenges & offline support",
+    "fullDescription": "CyberSafe Student Portal is your comprehensive cybersecurity education companion. Learn anywhere, anytime — even offline.\n\n🔐 LEARN CYBERSECURITY\n• Interactive modules covering password security, phishing detection, social media safety, and more\n• Video lessons with expert-curated content\n• Hands-on exercises and real-world scenarios\n\n🏆 GAMIFIED EXPERIENCE\n• Earn badges and achievements as you progress\n• Compete on leaderboards with fellow students\n• Complete daily challenges and maintain your learning streak\n\n🚩 CAPTURE THE FLAG (CTF)\n• Practice offensive and defensive security skills\n• Join teams and compete in live CTF competitions\n• Solve challenges across web, crypto, forensics, and more\n\n📱 MOBILE-FIRST FEATURES\n• Download modules for offline learning\n• Push notifications for streak reminders\n• QR code scanner for team joining and certificate verification\n• Biometric login with fingerprint\n\n👥 COMMUNITY\n• Join study groups and discussion forums\n• Connect with mentors and fellow learners\n• Share achievements and certificates\n\n📜 EARN CERTIFICATES\n• Verifiable certificates upon course completion\n• Share credentials on LinkedIn and social media\n• QR-code verification for authenticity\n\nCyberSafe is trusted by students and universities worldwide. Start your cybersecurity journey today!",
+    "tags": ["cybersecurity", "education", "CTF", "learning", "security", "student"],
+    "privacyPolicyUrl": "https://cybersafe-edu.lovable.app/privacy",
+    "featureGraphicSize": "1024x500"
+  },
+
+  "iconSizes": {
+    "ios": [20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 1024],
+    "android": [48, 72, 96, 144, 192, 512]
+  },
+
+  "submissionChecklist": {
+    "preSubmission": [
+      "All critical bugs fixed and verified",
+      "Performance testing passed (60fps scrolling, <2s cold start)",
+      "Offline download and playback verified",
+      "Push notifications tested on physical devices",
+      "Deep links tested (cybersafe:// and universal links)",
+      "Analytics and crash reporting (Sentry) configured",
+      "Biometric login tested on Face ID and Touch ID devices",
+      "All required app icon sizes generated",
+      "Screenshots captured for all required device sizes",
+      "Privacy policy published and accessible"
+    ],
+    "iosSpecific": [
+      "App Store Connect record created",
+      "TestFlight internal testing completed",
+      "TestFlight external beta submitted",
+      "Export compliance questions answered (uses HTTPS = Yes)",
+      "Content rights declaration completed",
+      "App Review guidelines compliance verified",
+      "Associated domains for universal links configured in Xcode",
+      "Production build signed with distribution certificate"
+    ],
+    "androidSpecific": [
+      "Google Play Console listing created",
+      "Internal test track build uploaded",
+      "Data safety form completed",
+      "Content rating questionnaire completed",
+      "Signed release APK/AAB generated",
+      "App Links verified with Digital Asset Links",
+      "Target API level meets Play Store requirements"
+    ],
+    "postLaunch": [
+      "Monitor crash reports for first 48 hours",
+      "Respond to initial user reviews",
+      "Email newsletter announcement sent",
+      "Social media launch posts published",
+      "In-app banner for existing web users to download mobile app"
+    ]
+  }
+}

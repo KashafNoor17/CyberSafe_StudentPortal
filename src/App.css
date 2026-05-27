@@ -1,0 +1,4 @@
+/* Ensure all direct children of common layout containers don't overflow */
+.container {
+  max-width: 100%;
+}

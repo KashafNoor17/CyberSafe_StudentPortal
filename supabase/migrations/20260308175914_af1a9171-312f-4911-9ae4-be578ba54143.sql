@@ -1,0 +1,1 @@
+ALTER TABLE public.phishing_templates ADD COLUMN IF NOT EXISTS red_flags JSONB DEFAULT '[]'::jsonb;

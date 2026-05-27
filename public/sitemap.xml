@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://cybersafe-edu.lovable.app/</loc><priority>1.0</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/modules</loc><priority>0.9</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/quiz</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/learn</loc><priority>0.8</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/blog</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/leaderboard</loc><priority>0.6</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/tips</loc><priority>0.7</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/community</loc><priority>0.7</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/ai-detector</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/password-checker</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/reviews</loc><priority>0.5</priority><changefreq>weekly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/verify</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/guide</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/faq</loc><priority>0.6</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/about</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/privacy</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/terms</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/cookies</loc><priority>0.3</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/accessibility</loc><priority>0.4</priority><changefreq>yearly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/contact</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/badges</loc><priority>0.5</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://cybersafe-edu.lovable.app/join-beta</loc><priority>0.4</priority><changefreq>monthly</changefreq></url>
+</urlset>
