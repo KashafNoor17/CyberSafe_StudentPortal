@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
 
 // Allowed origins for CORS
 const allowedOrigins = [
@@ -29,6 +30,16 @@ serve(async (req) => {
   }
 
   try {
+    // Server-side rate limit check (10 requests per 5 minutes)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { allowed, retryAfter } = await checkRateLimit(ip, "analyze-phishing", 10, 300);
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: `Too many requests. Please try again in ${retryAfter} seconds.` }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(retryAfter) } }
+      );
+    }
+
     // Verify user is authenticated
     const authHeader = req.headers.get("authorization");
     if (!authHeader) {

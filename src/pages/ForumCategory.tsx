@@ -98,12 +98,12 @@
          // Fetch reply counts and vote counts
          const postsWithCounts = await Promise.all(
            data.map(async (post: any) => {
-            // Fetch author name
-            const { data: authorData } = await supabase
-              .from('profiles')
-              .select('name')
-              .eq('user_id', post.user_id)
-              .single();
+             // Fetch author name from public profiles view
+             const { data: authorData } = await supabase
+               .from('profiles_public')
+               .select('name')
+               .eq('user_id', post.user_id)
+               .single();
 
              const [{ count: replyCount }, { data: votes }] = await Promise.all([
                supabase

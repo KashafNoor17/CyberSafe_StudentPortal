@@ -29,7 +29,8 @@ export default function Certificate() {
   const [generating, setGenerating] = useState(false);
   const certificateRef = useRef<HTMLDivElement>(null);
 
-  const baseUrl = 'https://cybersafe-edu.lovable.app';
+  // Use the current origin so verification links work on any deployment
+  const baseUrl = window.location.origin;
 
   useEffect(() => {
     if (!authLoading && !user) {

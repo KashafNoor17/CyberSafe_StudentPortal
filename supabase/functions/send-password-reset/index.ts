@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -37,7 +38,28 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email }: PasswordResetRequest = await req.json();
+    // Server-side rate limit check (3 requests per hour per IP)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { allowed, retryAfter } = await checkRateLimit(ip, "password-reset-ip", 3, 3600);
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: `Too many password reset requests. Please try again in ${Math.ceil(retryAfter / 60)} minutes.` }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(retryAfter) } }
+      );
+    }
+
+    const body = await req.json();
+    const email = body.email;
+    const clientRedirectTo = body.redirectTo;
+
+    let redirectTo = "https://cybersafe-edu.lovable.app/auth?mode=reset";
+    if (clientRedirectTo && typeof clientRedirectTo === "string") {
+      const isAllowed = allowedOrigins.some(origin => clientRedirectTo.startsWith(origin)) || 
+                        /https:\/\/[a-zA-Z0-9-]+--[a-zA-Z0-9-]+\.lovable\.app/.test(clientRedirectTo);
+      if (isAllowed) {
+        redirectTo = clientRedirectTo;
+      }
+    }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -106,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
       type: "recovery",
       email: normalizedEmail,
       options: {
-        redirectTo: "https://cybersafe-edu.lovable.app/auth?mode=reset",
+        redirectTo: redirectTo,
       },
     });
 

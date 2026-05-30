@@ -157,7 +157,7 @@ export default function Index() {
     (async () => {
       try {
         const [{ count: studentsCount }, { count: certsCount }] = await Promise.all([
-          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          supabase.from('profiles_public').select('*', { count: 'exact', head: true }),
           supabase.from('certificates').select('*', { count: 'exact', head: true }),
         ]);
         setHeroStats({
@@ -174,7 +174,7 @@ export default function Index() {
     (async () => {
       try {
         const { count: usersCount } = await supabase
-          .from('profiles')
+          .from('profiles_public')
           .select('*', { count: 'exact', head: true });
         const { count: modulesCount } = await supabase
           .from('learning_modules')

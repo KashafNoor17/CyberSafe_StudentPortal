@@ -84,7 +84,7 @@
          const postsWithReplies = await Promise.all(
            postsData.map(async (post: any) => {
             const { data: authorData } = await supabase
-              .from('profiles')
+              .from('profiles_public')
               .select('name')
               .eq('user_id', post.user_id)
               .single();

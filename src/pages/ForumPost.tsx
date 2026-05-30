@@ -73,9 +73,9 @@ import { useState, useEffect, useCallback } from 'react';
          .single();
  
       if (postData) {
-        // Fetch author name from profiles
+        // Fetch author name from public profiles view
         const { data: authorData } = await supabase
-          .from('profiles')
+          .from('profiles_public')
           .select('name')
           .eq('user_id', postData.user_id)
           .single();
@@ -118,9 +118,9 @@ import { useState, useEffect, useCallback } from 'react';
       if (repliesData) {
          const repliesWithVotes = await Promise.all(
           repliesData.map(async (reply: any) => {
-            // Fetch author name
+            // Fetch author name from public profiles view
             const { data: authorData } = await supabase
-              .from('profiles')
+              .from('profiles_public')
               .select('name')
               .eq('user_id', reply.user_id)
               .single();
@@ -251,40 +251,34 @@ import { useState, useEffect, useCallback } from 'react';
      }
    };
  
-   const handleMarkSolution = async (replyId: string) => {
-     if (!user || post?.user_id !== user.id) return;
- 
-     try {
-       // Clear previous solution
-       await supabase
-         .from('forum_replies')
-         .update({ is_solution: false })
-         .eq('post_id', id);
- 
-       // Mark new solution
-       await supabase
-         .from('forum_replies')
-         .update({ is_solution: true })
-         .eq('id', replyId);
- 
-       // Update post
-       await supabase
-         .from('forum_posts')
-         .update({ is_solution_found: true })
-         .eq('id', id);
- 
-       fetchPost();
-       fetchReplies();
-       toast({
-         title: 'Solution marked!',
-         description: 'This reply has been marked as the solution.',
-       });
-     } catch (error) {
-       if (import.meta.env.DEV) {
-         console.error('Error marking solution:', error);
-       }
-     }
-   };
+    const handleMarkSolution = async (replyId: string) => {
+      if (!user || post?.user_id !== user.id) return;
+
+      try {
+        // Call the secure RPC function to mark solution in a single transaction
+        const { error } = await supabase.rpc('mark_reply_as_solution', {
+          p_reply_id: replyId,
+        });
+
+        if (error) throw error;
+
+        fetchPost();
+        fetchReplies();
+        toast({
+          title: 'Solution marked!',
+          description: 'This reply has been marked as the solution.',
+        });
+      } catch (error: any) {
+        if (import.meta.env.DEV) {
+          console.error('Error marking solution:', error);
+        }
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to mark reply as solution.',
+        });
+      }
+    };
  
    const handleShare = () => {
      navigator.clipboard.writeText(window.location.href);

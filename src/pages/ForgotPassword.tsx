@@ -32,11 +32,14 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('send-password-reset', {
-        body: { email: email.toLowerCase().trim() },
+      const { data, error: resetError } = await supabase.functions.invoke('send-password-reset', {
+        body: { 
+          email: email.toLowerCase().trim(),
+          redirectTo: `${window.location.origin}/auth?mode=reset`
+        }
       });
 
-      if (fnError) throw fnError;
+      if (resetError || data?.error) throw resetError || new Error(data?.error);
 
       setSent(true);
       toast({

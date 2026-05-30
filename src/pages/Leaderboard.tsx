@@ -116,7 +116,7 @@ export default function Leaderboard() {
 
       const userIds = data.map(s => s.user_id);
       const { data: profiles } = await supabase
-        .from('profiles')
+        .from('profiles_public')
         .select('user_id, name')
         .in('user_id', userIds);
 

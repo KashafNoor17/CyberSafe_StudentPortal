@@ -1,14 +1,29 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit } from "../_shared/rateLimit.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// Allowed origins for CORS
+const allowedOrigins = [
+  'https://cybersafe-edu.lovable.app',
+  'https://id-preview--f8172b8a-dce7-4f81-9ee6-f01fa9dc0397.lovable.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
 
-function jsonResponse(data: unknown, status = 200) {
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && allowedOrigins.some(a => origin.startsWith(a.replace(/\/$/, '')))
+    ? origin
+    : (origin || allowedOrigins[0]);
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+  };
+}
+
+function jsonResponse(data: unknown, status = 200, corsHeaders: Record<string, string> = {}) {
   return new Response(JSON.stringify(data), {
     status,
+    // corsHeaders is injected per-request by a closure in serve()
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
@@ -105,9 +120,26 @@ async function cachedAICall(
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const origin = req.headers.get("origin");
+  const _corsHeaders = getCorsHeaders(origin);
+  // Bind corsHeaders into jsonResponse for this request so all call sites
+  // automatically get the correct per-request CORS headers.
+  const jsonResponse = (data: unknown, status = 200) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: { ..._corsHeaders, "Content-Type": "application/json" },
+    });
+
+  if (req.method === "OPTIONS") return new Response(null, { headers: _corsHeaders });
 
   try {
+    // Server-side rate limit check (10 requests per 5 minutes)
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const { allowed, retryAfter } = await checkRateLimit(ip, "ai-content", 10, 300);
+    if (!allowed) {
+      return jsonResponse({ error: `Too many requests. Please try again in ${retryAfter} seconds.` }, 429);
+    }
+
     const authHeader = req.headers.get("authorization");
     if (!authHeader) return jsonResponse({ error: "Auth required" }, 401);
 
