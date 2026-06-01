@@ -107,6 +107,18 @@ export default function Auth() {
     return () => clearInterval(interval);
   }, [lockedUntil]);
 
+  useEffect(() => {
+    if (!isReset) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // session is now available for password update
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, [isReset]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -133,6 +145,27 @@ export default function Auth() {
           setErrors(fieldErrors);
           setLoading(false);
           return;
+        }
+
+        // Verify active session exists before updating password
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!currentSession) {
+          await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              subscription.unsubscribe();
+              reject(new Error("Verification session timed out. The link may be invalid or expired."));
+            }, 8000);
+
+            const { data: { subscription } } = supabase.auth.onAuthStateChange(
+              (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                  clearTimeout(timeout);
+                  subscription.unsubscribe();
+                  resolve();
+                }
+              }
+            );
+          });
         }
 
         const { error } = await supabase.auth.updateUser({ password: formData.password });
