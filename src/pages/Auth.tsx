@@ -56,21 +56,12 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
+          redirectTo: window.location.origin
+        }
       });
-
-      if (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Google Sign-In Failed',
-          description: error.message || 'Failed to sign in with Google.',
-        });
-      }
-      // On success Supabase redirects the browser — no further action needed here.
     } catch (err: any) {
       toast({
         variant: 'destructive',
