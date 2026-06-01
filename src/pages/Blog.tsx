@@ -53,7 +53,6 @@ export default function Blog() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-      
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold font-display mb-4">
@@ -63,7 +62,6 @@ export default function Blog() {
             Learn, explore, and stay updated on cybersecurity. Tutorials, safety tips, and guides for students.
           </p>
         </div>
-
         <div className="flex flex-col md:flex-row gap-4 mb-8 animate-fade-in">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -75,7 +73,6 @@ export default function Blog() {
             />
           </div>
         </div>
-
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
@@ -90,8 +87,8 @@ export default function Blog() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post, index) => (
-              <Link 
-                key={post.id} 
+              <Link
+                key={post.id}
                 to={`/blog/${post.slug}`}
                 className="animate-fade-in"
                 style={{ animationDelay: `${0.1 + index * 0.05}s` }}
@@ -124,7 +121,6 @@ export default function Blog() {
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );
