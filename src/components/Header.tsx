@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Shield, Menu, LogOut, LayoutDashboard, BookOpen, Wrench,
-  Trophy, FileText, Settings, User, Users, Search
+  Trophy, FileText, Settings, User, Users, Search, Brain
 } from 'lucide-react';
 import { T } from '@/components/T';
 import { Button } from '@/components/ui/button';
@@ -40,6 +40,7 @@ export function Header() {
   // Primary nav items (always visible on desktop, first 3 on tablet)
   const navItems = [
     { label: 'Modules', href: '/modules', icon: BookOpen },
+    { label: 'Quiz', href: '/quiz', icon: Brain },
     { label: 'Free Tools', href: '/password-checker', icon: Wrench },
     { label: 'Community', href: '/community', icon: Users },
     { label: 'Blog', href: '/blog', icon: FileText },

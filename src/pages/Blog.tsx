@@ -37,7 +37,7 @@ export default function Blog() {
       const { data } = await supabase
         .from('blog_posts')
         .select('id, title, slug, excerpt, category, tags, created_at, views, featured_image')
-        .eq('is_published', true)
+        .eq('published', true)
         .order('created_at', { ascending: false });
 
       if (data) {
