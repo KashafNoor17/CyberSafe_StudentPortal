@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, User, ArrowRight, Tag, Search } from 'lucide-react';
+import { Calendar, ArrowRight, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,20 +13,13 @@ interface BlogPost {
   title: string;
   slug: string;
   excerpt: string | null;
-  category: string;
-  tags: string[];
   created_at: string;
-  views: number;
-  featured_image: string | null;
 }
-
-const categories = ['All', 'Security', 'Privacy', 'Phishing', 'Passwords', 'Network', 'Career'];
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
     fetchPosts();
@@ -36,7 +29,7 @@ export default function Blog() {
     try {
       const { data } = await supabase
         .from('blog_posts')
-        .select('id, title, slug, excerpt, category, tags, created_at, views, featured_image')
+        .select('id, title, slug, excerpt, created_at')
         .eq('published', true)
         .order('created_at', { ascending: false });
 
@@ -53,10 +46,8 @@ export default function Blog() {
   };
 
   const filteredPosts = posts.filter((post) => {
-    const matchesSearch = post.title.toLowerCase().includes(search.toLowerCase()) ||
-                          post.excerpt?.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory.toLowerCase();
-    return matchesSearch && matchesCategory;
+    return post.title.toLowerCase().includes(search.toLowerCase()) ||
+           post.excerpt?.toLowerCase().includes(search.toLowerCase());
   });
 
   return (
@@ -64,18 +55,16 @@ export default function Blog() {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold font-display mb-4">
             <span className="cyber-gradient-text">CyberSafe</span> Blog
           </h1>
           <p className="text-muted-foreground max-w-2xl">
-            Learn, explore, and stay updated on cybersecurity. Tutorials, CTF write-ups, career guidance, and safety tips for students.
+            Learn, explore, and stay updated on cybersecurity. Tutorials, safety tips, and guides for students.
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <div className="flex flex-col md:flex-row gap-4 mb-8 animate-fade-in">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -85,22 +74,8 @@ export default function Blog() {
               className="pl-10"
             />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className={selectedCategory === category ? 'cyber-gradient' : ''}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
         </div>
 
-        {/* Posts Grid */}
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
@@ -122,21 +97,7 @@ export default function Blog() {
                 style={{ animationDelay: `${0.1 + index * 0.05}s` }}
               >
                 <Card className="card-cyber h-full group">
-                  {post.featured_image && (
-                    <div className="h-48 bg-muted overflow-hidden">
-                      <img 
-                        src={post.featured_image} 
-                        alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                  )}
                   <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary capitalize">
-                        {post.category}
-                      </span>
-                    </div>
                     <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
                       {post.title}
                     </CardTitle>
@@ -156,15 +117,6 @@ export default function Blog() {
                         Read more <ArrowRight className="h-3 w-3" />
                       </div>
                     </div>
-                    {post.tags.length > 0 && (
-                      <div className="flex gap-1 mt-3 flex-wrap">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               </Link>
