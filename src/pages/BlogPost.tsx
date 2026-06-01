@@ -11,11 +11,7 @@ interface BlogPost {
   title: string;
   content: string;
   excerpt: string | null;
-  category: string;
-  tags: string[];
   created_at: string;
-  views: number;
-  featured_image: string | null;
 }
 
 export default function BlogPost() {
@@ -45,12 +41,6 @@ export default function BlogPost() {
       }
 
       setPost(data);
-
-      // Increment views
-      await supabase
-        .from('blog_posts')
-        .update({ views: (data.views || 0) + 1 })
-        .eq('id', data.id);
     } catch (error) {
       if (import.meta.env.DEV) console.error('Error fetching post:', error);
       navigate('/blog');
@@ -91,12 +81,6 @@ export default function BlogPost() {
         <article className="animate-fade-in">
           {/* Header */}
           <header className="mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary capitalize">
-                {post.category}
-              </span>
-            </div>
-            
             <h1 className="text-3xl md:text-4xl font-bold font-display mb-4">
               {post.title}
             </h1>
@@ -110,34 +94,9 @@ export default function BlogPost() {
                   day: 'numeric'
                 })}
               </div>
-              <div className="flex items-center gap-1">
-                <Eye className="h-4 w-4" />
-                {post.views} views
-              </div>
             </div>
-
-            {post.tags.length > 0 && (
-              <div className="flex items-center gap-2 mt-4 flex-wrap">
-                <Tag className="h-4 w-4 text-muted-foreground" />
-                {post.tags.map((tag) => (
-                  <span key={tag} className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
           </header>
 
-          {/* Featured Image */}
-          {post.featured_image && (
-            <div className="mb-8 rounded-xl overflow-hidden">
-              <img 
-                src={post.featured_image} 
-                alt={post.title}
-                className="w-full h-auto max-h-[400px] object-cover"
-              />
-            </div>
-          )}
 
           {/* Content */}
           <Card className="card-cyber">
