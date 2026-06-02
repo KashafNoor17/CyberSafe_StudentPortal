@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AIChatbot } from "@/components/AIChatbot";
 import { AccessibilitySettings } from "@/components/AccessibilitySettings";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
+
 import { PageLoader } from "@/components/PageLoader";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { MobileOfflineBanner } from "@/components/MobileOfflineBanner";
@@ -102,7 +102,7 @@ const RoutePrefetcher = () => {
   return null;
 };
 
-/** Hide chatbot, accessibility, and feedback widgets on the landing page */
+/** Hide chatbot and accessibility widgets on the landing page */
 const ConditionalGlobalUI = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
@@ -111,7 +111,6 @@ const ConditionalGlobalUI = () => {
     <>
       <AIChatbot />
       <AccessibilitySettings />
-      <FeedbackWidget />
     </>
   );
 };

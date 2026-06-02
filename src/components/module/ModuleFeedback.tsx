@@ -69,8 +69,13 @@ export function ModuleFeedback({ moduleId, moduleTitle }: ModuleFeedbackProps) {
       setSubmitted(true);
       toast({ title: 'Thank you!', description: 'Your feedback helps us improve.' });
       fetchAggregateRatings();
-    } catch {
-      toast({ variant: 'destructive', title: 'Error', description: 'Failed to submit feedback.' });
+    } catch (err) {
+      console.error('ModuleFeedback submit error:', err);
+      toast({
+        variant: 'destructive',
+        title: 'Could not submit feedback',
+        description: 'Please try again.',
+      });
     } finally {
       setSubmitting(false);
     }

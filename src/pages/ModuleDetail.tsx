@@ -11,7 +11,7 @@ import { PasswordStrengthExercise } from '@/components/PasswordStrengthExercise'
 import { PhishingExercise } from '@/components/PhishingExercise';
 import { PrivacySimulatorExercise } from '@/components/PrivacySimulatorExercise';
 import { BadgeNotification } from '@/components/BadgeNotification';
-import { PostModuleSurvey } from '@/components/PostModuleSurvey';
+
 import { ModuleSummary } from '@/components/module/ModuleSummary';
 import { ExplainConcept } from '@/components/module/ExplainConcept';
 import { ExerciseGenerator } from '@/components/module/ExerciseGenerator';
@@ -76,7 +76,7 @@ export default function ModuleDetail() {
   const [quizScore, setQuizScore] = useState<{ score: number; total: number } | null>(null);
   const [dbSections, setDbSections] = useState<DbModuleSection[]>([]);
   const [exerciseCompleted, setExerciseCompleted] = useState(false);
-  const [showSurvey, setShowSurvey] = useState(false);
+
   const [earnedBadge, setEarnedBadge] = useState<{
     name: string;
     description: string;
@@ -223,7 +223,6 @@ export default function ModuleDetail() {
       }
 
       setIsCompleted(true);
-      setShowSurvey(true);
 
       trackActivity('module_complete', module.id, {
         module_title: module.title,
@@ -479,19 +478,11 @@ export default function ModuleDetail() {
           />
         </div>
 
-        {showSurvey && module && (
+        {isCompleted && (
           <div className="mt-8 animate-fade-in">
-            <PostModuleSurvey
-              moduleId={module.id}
-              moduleTitle={module.title}
-              onClose={() => setShowSurvey(false)}
-            />
+            <ModuleFeedback moduleId={module.id} moduleTitle={module.title} />
           </div>
         )}
-
-        <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.58s' }}>
-          <ModuleFeedback moduleId={module.id} moduleTitle={module.title} />
-        </div>
 
         <div className="mt-8 animate-fade-in" style={{ animationDelay: '0.59s' }}>
           <ModuleCertificate moduleTitle={module.title} isCompleted={isCompleted} />
