@@ -11,19 +11,23 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory } = await req.json();
+    const { messages, context } = await req.json();
 
-    const messages = [
-      {
-        role: "system",
-        content: `You are CyberSafe AI, a friendly cybersecurity assistant for students. 
-        Help users learn about cybersecurity topics including passwords, phishing, 
-        network security, malware, privacy, and safe browsing. 
-        Keep responses concise, educational, and encouraging.
-        Use simple language suitable for beginners.`
-      },
-      ...(conversationHistory || []),
-      { role: "user", content: message }
+    const systemPrompt = `You are CyberSafe AI, a friendly and knowledgeable cybersecurity assistant for the CyberSafe Student Portal.
+Your role is to answer questions about cybersecurity topics (phishing, malware, passwords, safe browsing, etc.), help users navigate the platform, and provide security best practices in simple, student-friendly language.
+
+Guidelines:
+- Keep responses concise and educational (under 300 words).
+- Use emojis and formatting (bold, bullet points) for readability.
+- Be encouraging and supportive.
+${context ? `- Note: The user is currently learning about "${context}". Tailor your response to be relevant to this topic when applicable.` : ""}`;
+
+    const groqMessages = [
+      { role: "system", content: systemPrompt },
+      ...(messages || []).map((m: any) => ({
+        role: m.role,
+        content: m.content
+      }))
     ];
 
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -34,23 +38,30 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "llama3-8b-8192",
-        messages,
+        messages: groqMessages,
         max_tokens: 500,
         temperature: 0.7,
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`Groq API returned status ${response.status}`);
+    }
+
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Sorry, I could not generate a response.";
+    const content = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't generate a response.";
 
     return new Response(
-      JSON.stringify({ reply }),
+      JSON.stringify({ content }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("Chat error:", error);
     return new Response(
-      JSON.stringify({ error: "An error occurred processing your request." }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ 
+        content: "I'm having trouble connecting right now. Please try again in a moment." 
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
