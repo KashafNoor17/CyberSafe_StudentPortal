@@ -37,7 +37,7 @@ ${context ? `- Note: The user is currently learning about "${context}". Tailor y
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",
         messages: groqMessages,
         max_tokens: 500,
         temperature: 0.7,
