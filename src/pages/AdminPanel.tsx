@@ -198,7 +198,7 @@ export default function AdminPanel() {
       ] = await Promise.all([
         supabase.from('profiles').select('id, user_id, name, email, total_points, level, created_at').order('created_at', { ascending: false }),
         supabase.from('quiz_results').select('user_id, score, total_questions, completed_at').order('completed_at', { ascending: false }).limit(50),
-        supabase.from('weekly_tips').select('*').order('year', { ascending: false }).order('week_number', { ascending: false }),
+        supabase.from('weekly_tips').select('*').order('created_at', { ascending: false }),
         supabase.from('blog_posts').select('id, title, slug, excerpt, category, is_published, views, created_at').order('created_at', { ascending: false }),
         supabase.from('reviews').select('*').order('created_at', { ascending: false }),
         supabase.from('learning_modules').select('id, title, slug, description, order_index').order('order_index'),
@@ -218,7 +218,20 @@ export default function AdminPanel() {
         setQuizResults(resultsWithUsers);
       }
 
-      setTips(tipsRes.data || []);
+      if (tipsRes.data) {
+        const mappedTips = tipsRes.data.map((tip: any) => ({
+          ...tip,
+          tip_text: tip.content || '',
+          headline: tip.title || '',
+          week_number: 1,
+          year: new Date().getFullYear(),
+          risk_level: 'medium',
+          is_banner: false,
+        }));
+        setTips(mappedTips);
+      } else {
+        setTips([]);
+      }
       setBlogs(blogsRes.data || []);
       setModules(modulesRes.data || []);
 
@@ -273,11 +286,10 @@ export default function AdminPanel() {
     if (!tipForm.tip_text || !tipForm.week_number) return;
     try {
       const { error } = await supabase.from('weekly_tips').insert([{
-        tip_text: tipForm.tip_text, headline: tipForm.headline || null,
-        detailed_text: tipForm.detailed_text || null, why_it_matters: tipForm.why_it_matters || null,
-        action_step: tipForm.action_step || null, week_number: parseInt(tipForm.week_number),
-        year: parseInt(tipForm.year), category: tipForm.category,
-        risk_level: tipForm.risk_level, difficulty: tipForm.difficulty, is_banner: tipForm.is_banner,
+        title: tipForm.headline || tipForm.tip_text.slice(0, 80),
+        content: tipForm.detailed_text || tipForm.tip_text,
+        category: tipForm.category,
+        published: true
       }]);
       if (error) throw error;
       toast({ title: 'Tip added successfully!' });

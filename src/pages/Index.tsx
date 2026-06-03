@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { T } from '@/components/T';
 import { Footer } from '@/components/Footer';
+import { FreeToolsSection } from '@/components/FreeToolsSection';
 
 
 
@@ -536,55 +537,9 @@ export default function Index() {
                 </Link>
               </div>
 
-              {/* RIGHT COLUMN — 2x2 Tool Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Tool 1 */}
-                <Link to="/password-checker" className="rounded-xl border border-border bg-card p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group flex flex-col gap-3">
-                  <div className="bg-primary/20 p-2 rounded-lg w-fit">
-                    <Key className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="font-semibold text-sm text-foreground"><T>Password Checker</T></div>
-                  <p className="text-xs text-muted-foreground"><T>Get an instant strength score and crack-time estimate.</T></p>
-                  <span className="text-xs text-primary mt-auto inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    <T>Try it free</T> <ArrowRight className="h-3 w-3" />
-                  </span>
-                </Link>
-
-                {/* Tool 2 */}
-                <Link to="/ai-detector" className="rounded-xl border border-border bg-card p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group flex flex-col gap-3">
-                  <div className="bg-accent/20 p-2 rounded-lg w-fit">
-                    <Bot className="h-5 w-5 text-accent" />
-                  </div>
-                  <div className="font-semibold text-sm text-foreground"><T>AI Phishing Detector</T></div>
-                  <p className="text-xs text-muted-foreground"><T>Paste any suspicious email. Our AI analyzes it for phishing indicators instantly.</T></p>
-                  <span className="text-xs text-primary mt-auto inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    <T>Try it free</T> <ArrowRight className="h-3 w-3" />
-                  </span>
-                </Link>
-
-                {/* Tool 3 */}
-                <Link to="/security-score" className="rounded-xl border border-border bg-card p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group flex flex-col gap-3">
-                  <div className="bg-success/20 p-2 rounded-lg w-fit">
-                    <BarChart3 className="h-5 w-5 text-success" />
-                  </div>
-                  <div className="font-semibold text-sm text-foreground"><T>Security Score</T></div>
-                  <p className="text-xs text-muted-foreground"><T>See your personal cybersecurity score based on your progress and results.</T></p>
-                  <span className="text-xs text-primary mt-auto inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    <T>Try it free</T> <ArrowRight className="h-3 w-3" />
-                  </span>
-                </Link>
-
-                {/* Tool 4 */}
-                <Link to="/tips" className="rounded-xl border border-border bg-card p-5 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group flex flex-col gap-3">
-                  <div className="bg-warning/20 p-2 rounded-lg w-fit">
-                    <Lightbulb className="h-5 w-5 text-warning" />
-                  </div>
-                  <div className="font-semibold text-sm text-foreground"><T>Weekly Security Tips</T></div>
-                  <p className="text-xs text-muted-foreground"><T>Fresh cybersecurity advice every week. Practical and instantly applicable.</T></p>
-                  <span className="text-xs text-primary mt-auto inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    <T>Read tips</T> <ArrowRight className="h-3 w-3" />
-                  </span>
-                </Link>
+              {/* RIGHT COLUMN — Vertical Tools List */}
+              <div className="w-full">
+                <FreeToolsSection layout="vertical" />
               </div>
             </div>
           </div>

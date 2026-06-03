@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { FreeToolsSection } from '@/components/FreeToolsSection';
 
 interface AnalysisResult {
   verdict: 'safe' | 'suspicious' | 'phishing';
@@ -321,6 +322,7 @@ export default function AIPhishingDetector() {
             )}
           </div>
         </div>
+        <FreeToolsSection layout="compact" />
       </main>
 
       <Footer />

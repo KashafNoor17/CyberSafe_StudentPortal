@@ -164,7 +164,7 @@ const App = () => (
                 <Route path="/breach-alerts" element={<PrivateRoute><BreachAlerts /></PrivateRoute>} />
                 <Route path="/password-health" element={<PrivateRoute><PasswordHealth /></PrivateRoute>} />
                 <Route path="/incident-response" element={<PrivateRoute><IncidentResponse /></PrivateRoute>} />
-                <Route path="/ai-detector" element={<PrivateRoute><AIPhishingDetector /></PrivateRoute>} />
+                <Route path="/ai-detector" element={<AIPhishingDetector />} />
                 <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

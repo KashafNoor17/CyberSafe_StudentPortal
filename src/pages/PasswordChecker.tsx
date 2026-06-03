@@ -7,6 +7,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Progress } from '@/components/ui/progress';
 import { T } from '@/components/T';
+import { FreeToolsSection } from '@/components/FreeToolsSection';
 
 interface PasswordAnalysis {
   strength: 'very-weak' | 'weak' | 'medium' | 'strong' | 'very-strong';
@@ -386,6 +387,8 @@ export default function PasswordChecker() {
             </Card>
           </div>
         )}
+
+        <FreeToolsSection layout="compact" />
       </main>
 
       <Footer />

@@ -204,7 +204,7 @@ export function Footer() {
       <footer className="bg-card border-t border-border relative overflow-hidden" role="contentinfo">
         <div className="absolute inset-0 grid-pattern opacity-5" aria-hidden="true" />
         
-        <div className="container mx-auto px-4 py-12 relative">
+        <div className="container mx-auto px-4 pt-12 pb-24 md:pb-16 relative">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Brand */}
             <div className="lg:col-span-2">
@@ -278,7 +278,7 @@ export function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 px-4 md:px-20 lg:px-28">
             <p className="text-sm text-muted-foreground text-center">
               {t('footer.copyright', { year: new Date().getFullYear() })}
             </p>

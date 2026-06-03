@@ -49,7 +49,7 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
         supabase.from('learning_modules').select('id, title, slug, description').ilike('title', term).limit(5),
         supabase.from('blog_posts').select('id, title, slug, excerpt').ilike('title', term).eq('is_published', true).limit(5),
         supabase.from('forum_posts').select('id, title').ilike('title', term).limit(5),
-        supabase.from('weekly_tips').select('id, tip_text, headline').or(`tip_text.ilike.${term},headline.ilike.${term}`).limit(3),
+        supabase.from('weekly_tips').select('id, title, content').or(`title.ilike.${term},content.ilike.${term}`).limit(3),
       ]);
 
       const all: SearchResult[] = [
@@ -76,9 +76,9 @@ export function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
         })),
         ...(tipsRes.data || []).map(t => ({
           type: 'tip' as const,
-          title: (t as any).headline || t.tip_text.slice(0, 60),
-          snippet: t.tip_text.slice(0, 120),
-          url: '/weekly-tips',
+          title: t.title || '',
+          snippet: t.content?.slice(0, 120) || '',
+          url: '/tips',
           icon: Sparkles,
         })),
       ];

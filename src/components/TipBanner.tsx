@@ -27,13 +27,19 @@ export function TipBanner() {
     try {
       const { data } = await supabase
         .from('weekly_tips')
-        .select('id, tip_text, headline, category, risk_level')
-        .eq('is_banner', true)
+        .select('id, title, content, category')
         .order('created_at', { ascending: false })
         .limit(5);
 
       if (data && data.length > 0) {
-        setTips(data);
+        const mappedData = data.map((item: any) => ({
+          id: item.id,
+          tip_text: item.content || '',
+          headline: item.title || '',
+          category: item.category || 'general',
+          risk_level: 'medium',
+        }));
+        setTips(mappedData);
       }
     } catch (error) {
       if (import.meta.env.DEV) {

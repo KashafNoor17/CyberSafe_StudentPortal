@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { T } from '@/components/T';
+import { FreeToolsSection } from '@/components/FreeToolsSection';
 
 interface Tip {
   id: string;
@@ -63,25 +64,52 @@ export default function WeeklyTips() {
   const [helpfulTips, setHelpfulTips] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth?mode=login');
-    }
-  }, [user, authLoading, navigate]);
+    fetchTips();
+  }, []);
 
   useEffect(() => {
     if (user) {
-      fetchTips();
       fetchHelpfulHistory();
+    } else {
+      setHelpfulTips(new Set());
     }
   }, [user]);
 
   const fetchTips = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('weekly_tips')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (data) setTips(data as Tip[]);
+        .select('*');
+      
+      if (error) throw error;
+
+      if (data) {
+        const mappedTips = data.map((tip: any) => ({
+          id: tip.id,
+          tip_text: tip.content || '',
+          headline: tip.title || '',
+          detailed_text: tip.content || '',
+          why_it_matters: null,
+          action_step: null,
+          category: tip.category || 'general',
+          risk_level: 'medium',
+          difficulty: 'beginner',
+          tags: [],
+          helpful_count: 0,
+          viewed_count: 0,
+          week_number: 1,
+          year: new Date().getFullYear(),
+        }));
+
+        // Sort manually by created_at descending
+        mappedTips.sort((a: any, b: any) => {
+          const rowA = data.find((d: any) => d.id === a.id);
+          const rowB = data.find((d: any) => d.id === b.id);
+          return new Date(rowB?.created_at || 0).getTime() - new Date(rowA?.created_at || 0).getTime();
+        });
+
+        setTips(mappedTips);
+      }
     } catch (error) {
       if (import.meta.env.DEV) console.error('Error fetching tips:', error);
     } finally {
@@ -102,7 +130,14 @@ export default function WeeklyTips() {
   };
 
   const handleMarkHelpful = async (tipId: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: 'Authentication Required',
+        description: 'You must be signed in to mark tips as helpful.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const alreadyHelpful = helpfulTips.has(tipId);
 
     try {
@@ -115,12 +150,6 @@ export default function WeeklyTips() {
         }, { onConflict: 'user_id,tip_id' });
 
       if (error) throw error;
-
-      // Update local helpful_count
-      await supabase
-        .from('weekly_tips')
-        .update({ helpful_count: tips.find(t => t.id === tipId)!.helpful_count + (alreadyHelpful ? -1 : 1) })
-        .eq('id', tipId);
 
       setHelpfulTips(prev => {
         const next = new Set(prev);
@@ -356,6 +385,8 @@ export default function WeeklyTips() {
             </CardContent>
           </Card>
         )}
+
+        <FreeToolsSection layout="compact" />
       </main>
 
       <Footer />
