@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { User, Lock, Settings, Bell, Camera, ArrowLeft, Shield, Calendar } from 'lucide-react';
 import { T } from '@/components/T';
@@ -52,65 +52,21 @@ const DEFAULT_NOTIFICATIONS = {
   frequency: 'daily',
 };
 
-interface FullProfile {
-  name: string;
-  email: string;
-  display_name: string;
-  bio: string;
-  phone: string;
-  location: string;
-  avatar_url: string;
-  created_at: string;
-  level: string;
-  total_points: number;
-  preferences: typeof DEFAULT_PREFERENCES;
-  notification_settings: typeof DEFAULT_NOTIFICATIONS;
-}
-
 export default function Profile() {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, profile, profileLoading, fetchProfile, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<FullProfile | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+
+  const currentTab = searchParams.get('tab') || 'personal';
 
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth?mode=login');
     }
   }, [user, authLoading, navigate]);
-
-  const fetchProfile = useCallback(async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (data) {
-      const raw = data as any;
-      setProfile({
-        name: raw.name || '',
-        email: raw.email || '',
-        display_name: raw.display_name || '',
-        bio: raw.bio || '',
-        phone: raw.phone || '',
-        location: raw.location || '',
-        avatar_url: raw.avatar_url || '',
-        created_at: raw.created_at || '',
-        level: raw.level || 'Cyber Novice',
-        total_points: raw.total_points || 0,
-        preferences: { ...DEFAULT_PREFERENCES, ...(raw.preferences || {}) },
-        notification_settings: { ...DEFAULT_NOTIFICATIONS, ...(raw.notification_settings || {}) },
-      });
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -148,7 +104,7 @@ export default function Profile() {
         .eq('user_id', user.id);
       if (updateError) throw updateError;
 
-      setProfile(prev => prev ? { ...prev, avatar_url: avatarUrlWithCache } : prev);
+      await fetchProfile();
       toast({ title: t('profile.avatarUpdated', 'Avatar Updated'), description: t('profile.avatarUpdatedDesc', 'Your profile picture has been changed.') });
     } catch (err: any) {
       toast({ variant: 'destructive', title: t('profile.uploadFailed', 'Upload Failed'), description: err.message });
@@ -160,13 +116,43 @@ export default function Profile() {
   const getInitials = (name: string) =>
     name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
-  if (authLoading || !profile) {
+  if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-muted-foreground">{t('profile.loading')}</p>
         </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
+          <Card className="max-w-md w-full border-destructive/30">
+            <CardContent className="pt-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h2 className="text-xl font-bold mb-2"><T>Profile Loading Failed</T></h2>
+              <p className="text-muted-foreground mb-4">
+                <T>We were unable to load your profile details for</T> <strong className="text-foreground">{user?.email}</strong>.
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button onClick={() => fetchProfile()} className="w-full">
+                  <T>Retry Loading Profile</T>
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/dashboard')} className="w-full">
+                  <T>Back to Dashboard</T>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -228,7 +214,7 @@ export default function Profile() {
           </Card>
 
           {/* Tabs */}
-          <Tabs defaultValue="personal" className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <Tabs value={currentTab} onValueChange={(val) => setSearchParams({ tab: val })} className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <TabsList className="grid w-full grid-cols-5 mb-6">
               <TabsTrigger value="personal" className="flex items-center gap-1.5">
                 <User className="h-4 w-4" />

@@ -3,10 +3,51 @@ import { User, Session } from '@supabase/supabase-js';
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 
+const DEFAULT_PREFERENCES = {
+  theme: 'system',
+  language: 'en',
+  auto_play_videos: true,
+  show_reminders: true,
+  public_profile: false,
+  high_contrast: false,
+  reduce_motion: false,
+  large_text: false,
+};
+
+const DEFAULT_NOTIFICATIONS = {
+  email: {
+    module_complete: true,
+    badge_earned: true,
+    certificate_ready: true,
+    community_replies: false,
+    friend_requests: false,
+    weekly_report: false,
+    product_updates: false,
+    marketing: false,
+  },
+  push: {
+    learning_reminders: true,
+    streak_alerts: true,
+    community_posts: false,
+    friend_activity: false,
+  },
+  frequency: 'daily',
+};
+
 interface Profile {
   id: string;
   name: string;
   email: string;
+  display_name: string;
+  bio: string;
+  phone: string;
+  location: string;
+  avatar_url: string;
+  created_at: string;
+  level: string;
+  total_points: number;
+  preferences: typeof DEFAULT_PREFERENCES;
+  notification_settings: typeof DEFAULT_NOTIFICATIONS;
 }
 
 interface AuthContextType {
@@ -15,6 +56,8 @@ interface AuthContextType {
   profile: Profile | null;
   isAdmin: boolean;
   loading: boolean;
+  profileLoading: boolean;
+  fetchProfile: (userId?: string, currentUser?: User | null) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -28,6 +71,98 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  const fetchProfile = async (userId?: string, currentUser?: User | null) => {
+    const targetUserId = userId || user?.id || session?.user?.id;
+    if (!targetUserId) {
+      setProfileLoading(false);
+      return;
+    }
+    setProfileLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', targetUserId)
+        .maybeSingle();
+
+      const activeUser = currentUser || user;
+
+      if (error) {
+        console.error('Error fetching profile in AuthContext:', error);
+        setProfile({
+          id: targetUserId,
+          name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+          email: activeUser?.email || '',
+          display_name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+          bio: '',
+          phone: '',
+          location: '',
+          avatar_url: '',
+          created_at: new Date().toISOString(),
+          level: 'Cyber Novice',
+          total_points: 0,
+          preferences: DEFAULT_PREFERENCES,
+          notification_settings: DEFAULT_NOTIFICATIONS,
+        });
+      } else if (!data) {
+        console.warn('Profile row missing in Supabase for user:', targetUserId);
+        setProfile({
+          id: targetUserId,
+          name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+          email: activeUser?.email || '',
+          display_name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+          bio: '',
+          phone: '',
+          location: '',
+          avatar_url: '',
+          created_at: new Date().toISOString(),
+          level: 'Cyber Novice',
+          total_points: 0,
+          preferences: DEFAULT_PREFERENCES,
+          notification_settings: DEFAULT_NOTIFICATIONS,
+        });
+      } else {
+        const raw = data as any;
+        setProfile({
+          id: raw.id,
+          name: raw.name || '',
+          email: raw.email || '',
+          display_name: raw.display_name || '',
+          bio: raw.bio || '',
+          phone: raw.phone || '',
+          location: raw.location || '',
+          avatar_url: raw.avatar_url || '',
+          created_at: raw.created_at || '',
+          level: raw.level || 'Cyber Novice',
+          total_points: raw.total_points || 0,
+          preferences: { ...DEFAULT_PREFERENCES, ...(raw.preferences || {}) },
+          notification_settings: { ...DEFAULT_NOTIFICATIONS, ...(raw.notification_settings || {}) },
+        });
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching profile in AuthContext:', err);
+      const activeUser = currentUser || user;
+      setProfile({
+        id: targetUserId,
+        name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+        email: activeUser?.email || '',
+        display_name: activeUser?.user_metadata?.name || activeUser?.email?.split('@')[0] || 'User',
+        bio: '',
+        phone: '',
+        location: '',
+        avatar_url: '',
+        created_at: new Date().toISOString(),
+        level: 'Cyber Novice',
+        total_points: 0,
+        preferences: DEFAULT_PREFERENCES,
+        notification_settings: DEFAULT_NOTIFICATIONS,
+      });
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener FIRST.
@@ -41,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
           setProfile(null);
           setIsAdmin(false);
+          setProfileLoading(false);
           Sentry.setUser(null);
           return;
         }
@@ -54,9 +190,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             Sentry.setUser({ id: session.user.id });
             // Use setTimeout(0) to avoid Supabase deadlock on state change
             setTimeout(() => {
-              fetchProfile(session.user.id);
+              fetchProfile(session.user.id, session.user);
               checkAdminRole(session.user.id);
             }, 0);
+          } else {
+            setProfileLoading(false);
           }
         }
       }
@@ -68,26 +206,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         Sentry.setUser({ id: session.user.id });
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user);
         checkAdminRole(session.user.id);
+      } else {
+        setProfileLoading(false);
       }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, name, email')
-      .eq('user_id', userId)
-      .maybeSingle();
-    
-    if (!error && data) {
-      setProfile(data);
-    }
-  };
 
   const checkAdminRole = async (userId: string) => {
     const { data, error } = await supabase
@@ -177,6 +305,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       isAdmin,
       loading,
+      profileLoading,
+      fetchProfile,
       signUp,
       signIn,
       signOut
